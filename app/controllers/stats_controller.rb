@@ -2,7 +2,7 @@ class StatsController < ApplicationController
   before_action :require_user, only: %i(index range notes wikis users questions comments tags)
 
   def subscriptions
-    @tags = Rails.cache.fetch("subscriptions-query", expires_in: 1) do
+    @tags = Rails.cache.fetch("subscriptions-stats-query", expires_in: 24.hours) do
       Tag
         .joins("INNER JOIN tag_selections ON term_data.tid = tag_selections.tid")
         .select("term_data.name")
