@@ -6,7 +6,7 @@ class StatsController < ApplicationController
       Tag
         .joins("LEFT JOIN tag_selections ON term_data.tid = tag_selections.tid")
         .select("term_data.name")
-        .where("tag_selections.following == 't'")
+        .where(:tag_selections => {:following => true})
         .group("term_data.name")
         .order("count DESC")
         .size
