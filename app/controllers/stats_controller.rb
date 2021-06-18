@@ -2,13 +2,15 @@ class StatsController < ApplicationController
   before_action :require_user, only: %i(index range notes wikis users questions comments tags)
 
   def subscriptions
-    @tags = Tag
-              .joins("LEFT JOIN tag_selections ON term_data.tid = tag_selections.tid")
-              .select("term_data.name")
-              .where("tag_selections.following == 't'")
-              .group("term_data.name")
-              .order("count DESC")
-              .size
+    @tags = Rails.cache.fetch("subscriptions-query", expires_in: 1) do
+      Tag
+        .joins("LEFT JOIN tag_selections ON term_data.tid = tag_selections.tid")
+        .select("term_data.name")
+        .where("tag_selections.following == 't'")
+        .group("term_data.name")
+        .order("count DESC")
+        .size
+    end
     @tags = @tags.group_by { |_k, v| v / 10 }.sort_by { |k, _v| -k }
   end
 
