@@ -4,11 +4,12 @@ class StatsController < ApplicationController
   def subscriptions
     @tags = Rails.cache.fetch("subscriptions-query", expires_in: 1) do
       Tag
-        .joins("LEFT JOIN tag_selections ON term_data.tid = tag_selections.tid")
+        .joins("INNER JOIN tag_selections ON term_data.tid = tag_selections.tid")
         .select("term_data.name")
         .where(:tag_selections => {:following => true})
         .group("term_data.name")
-        .order("count DESC")
+        .joins("INNER JOIN rusers ON rusers.id = tag_selections.user_id")
+        .where("rusers.status = 1 OR rusers.status = 4")
         .size
     end
     @tags = @tags.group_by { |_k, v| v / 10 }.sort_by { |k, _v| -k }
