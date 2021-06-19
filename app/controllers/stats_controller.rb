@@ -6,7 +6,7 @@ class StatsController < ApplicationController
       Tag
         .joins("INNER JOIN tag_selections ON term_data.tid = tag_selections.tid")
         .select("term_data.name")
-        .where(:tag_selections => {:following => true})
+        .where(tag_selections: { following: true })
         .group("term_data.name")
         .joins("INNER JOIN rusers ON rusers.id = tag_selections.user_id")
         .where("rusers.status = 1 OR rusers.status = 4")
